@@ -69,6 +69,139 @@ async function startServer() {
       }
     });
 
+    // Get single post
+    app.get('/api/posts/:id', async (req, res) => {
+      try {
+        const { id } = req.params;
+        const post = await prisma.post.findUnique({
+          where: { id },
+          include: {
+            author: {
+              select: {
+                id: true,
+                email: true,
+                username: true,
+              },
+            },
+            categories: true,
+            tags: true,
+          },
+        });
+        
+        if (!post) {
+          return res.status(404).json({ error: 'Post not found' });
+        }
+        
+        res.json(post);
+      } catch (error) {
+        res.status(500).json({ error: 'Failed to fetch post' });
+      }
+    });
+
+    // Create new post
+    app.post('/api/posts', async (req, res) => {
+      try {
+        const { title, content, published = false, authorId } = req.body;
+        
+        const post = await prisma.post.create({
+          data: {
+            title,
+            content,
+            published,
+            authorId,
+          },
+          include: {
+            author: {
+              select: {
+                id: true,
+                email: true,
+                username: true,
+              },
+            },
+            categories: true,
+            tags: true,
+          },
+        });
+        
+        res.status(201).json(post);
+      } catch (error) {
+        res.status(500).json({ error: 'Failed to create post' });
+      }
+    });
+
+    // Update post
+    app.put('/api/posts/:id', async (req, res) => {
+      try {
+        const { id } = req.params;
+        const { title, content, published } = req.body;
+        
+        const post = await prisma.post.update({
+          where: { id },
+          data: {
+            ...(title && { title }),
+            ...(content && { content }),
+            ...(published !== undefined && { published }),
+          },
+          include: {
+            author: {
+              select: {
+                id: true,
+                email: true,
+                username: true,
+              },
+            },
+            categories: true,
+            tags: true,
+          },
+        });
+        
+        res.json(post);
+      } catch (error) {
+        res.status(500).json({ error: 'Failed to update post' });
+      }
+    });
+
+    // Delete post
+    app.delete('/api/posts/:id', async (req, res) => {
+      try {
+        const { id } = req.params;
+        
+        await prisma.post.delete({
+          where: { id },
+        });
+        
+        res.status(204).send();
+      } catch (error) {
+        res.status(500).json({ error: 'Failed to delete post' });
+      }
+    });
+
+    // Create a user endpoint for post creation
+    app.post('/api/users', async (req, res) => {
+      try {
+        const { email, username, password } = req.body;
+        
+        const user = await prisma.user.create({
+          data: {
+            email,
+            username,
+            password, // In production, hash this!
+          },
+          select: {
+            id: true,
+            email: true,
+            username: true,
+            role: true,
+            createdAt: true,
+          },
+        });
+        
+        res.status(201).json(user);
+      } catch (error) {
+        res.status(500).json({ error: 'Failed to create user' });
+      }
+    });
+
     // Start the server
     app.listen(PORT, () => {
       console.log(`🚀 Server ready at http://localhost:${PORT}`);

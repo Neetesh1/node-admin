@@ -9,6 +9,8 @@ import { expressMiddleware } from '@apollo/server/express4';
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
 import { buildSchema } from 'type-graphql';
 import http from 'http';
+import AdminJS from 'adminjs';
+import AdminJSExpress from '@adminjs/express';
 
 import { prisma } from './config/database';
 import { UserResolver } from './graphql/resolvers/UserResolver';
@@ -74,9 +76,11 @@ async function startServer() {
       })
     );
 
-    // AdminJS Setup
-    const adminConfig = await createAdminConfig();
-    const admin = new AdminJS(adminConfig);
+    // AdminJS Setup (simplified)
+    const admin = new AdminJS({
+      resources: [],
+      rootPath: '/admin',
+    });
     
     const adminRouter = AdminJSExpress.buildRouter(admin);
     app.use(admin.options.rootPath, adminRouter);

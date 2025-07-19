@@ -1,0 +1,122 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="auth-header">
+      <h2>{{ isLoginMode ? 'Login' : 'Register' }}</h2>
+      <p>{{ isLoginMode ? 'Welcome back!' : 'Create your account' }}</p>
+    </div>
+
+    @if (error) {
+      <div class="error-message">
+        {{ error }}
+      </div>
+    }
+
+    <form [formGroup]="isLoginMode ? loginForm : registerForm" (ngSubmit)="onSubmit()" class="auth-form">
+      @if (isLoginMode) {
+        <!-- Login Form -->
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            [class.invalid]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
+            placeholder="Enter your email"
+          />
+          @if (getFieldError(loginForm, 'email')) {
+            <span class="field-error">{{ getFieldError(loginForm, 'email') }}</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input
+            id="password"
+            type="password"
+            formControlName="password"
+            [class.invalid]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+            placeholder="Enter your password"
+          />
+          @if (getFieldError(loginForm, 'password')) {
+            <span class="field-error">{{ getFieldError(loginForm, 'password') }}</span>
+          }
+        </div>
+      } @else {
+        <!-- Register Form -->
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            [class.invalid]="registerForm.get('email')?.invalid && registerForm.get('email')?.touched"
+            placeholder="Enter your email"
+          />
+          @if (getFieldError(registerForm, 'email')) {
+            <span class="field-error">{{ getFieldError(registerForm, 'email') }}</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="username">Username (Optional)</label>
+          <input
+            id="username"
+            type="text"
+            formControlName="username"
+            placeholder="Enter your username"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input
+            id="password"
+            type="password"
+            formControlName="password"
+            [class.invalid]="registerForm.get('password')?.invalid && registerForm.get('password')?.touched"
+            placeholder="Enter your password"
+          />
+          @if (getFieldError(registerForm, 'password')) {
+            <span class="field-error">{{ getFieldError(registerForm, 'password') }}</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">Confirm Password</label>
+          <input
+            id="confirmPassword"
+            type="password"
+            formControlName="confirmPassword"
+            [class.invalid]="registerForm.get('confirmPassword')?.invalid && registerForm.get('confirmPassword')?.touched"
+            placeholder="Confirm your password"
+          />
+          @if (getFieldError(registerForm, 'confirmPassword')) {
+            <span class="field-error">{{ getFieldError(registerForm, 'confirmPassword') }}</span>
+          }
+        </div>
+      }
+
+      <button
+        type="submit"
+        class="btn btn-primary btn-full"
+        [disabled]="loading || (isLoginMode ? loginForm.invalid : registerForm.invalid)"
+      >
+        @if (loading) {
+          <span class="loading-spinner"></span>
+          {{ isLoginMode ? 'Logging in...' : 'Registering...' }}
+        } @else {
+          {{ isLoginMode ? 'Login' : 'Register' }}
+        }
+      </button>
+    </form>
+
+    <div class="auth-switch">
+      <p>
+        {{ isLoginMode ? "Don't have an account?" : "Already have an account?" }}
+        <button type="button" (click)="toggleMode()" class="link-button">
+          {{ isLoginMode ? 'Register here' : 'Login here' }}
+        </button>
+      </p>
+    </div>
+  </div>
+</div>

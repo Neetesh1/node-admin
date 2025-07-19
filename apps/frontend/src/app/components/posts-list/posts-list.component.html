@@ -1,0 +1,88 @@
+<div class="posts-container">
+  <div class="posts-header">
+    <h1>Blog Posts</h1>
+    <button routerLink="/posts/create" class="btn btn-primary">
+      Create New Post
+    </button>
+  </div>
+
+  @if (loading) {
+    <div class="loading-container">
+      <div class="loading-spinner"></div>
+      <p>Loading posts...</p>
+    </div>
+  } @else if (error) {
+    <div class="error-container">
+      <p class="error-message">{{ error }}</p>
+      <button (click)="loadPosts()" class="btn btn-outline">
+        Try Again
+      </button>
+    </div>
+  } @else if (posts.length === 0) {
+    <div class="empty-container">
+      <h3>No posts found</h3>
+      <p>Be the first to create a post!</p>
+      <button routerLink="/posts/create" class="btn btn-primary">
+        Create First Post
+      </button>
+    </div>
+  } @else {
+    <div class="posts-grid">
+      @for (post of posts; track post.id) {
+        <div class="post-card">
+          <div class="post-content">
+            <div class="post-header">
+              <h2 class="post-title">
+                <a [routerLink]="['/posts', post.id]">{{ post.title }}</a>
+              </h2>
+              <div class="post-meta">
+                <span class="post-author">
+                  by {{ post.author.username || post.author.email }}
+                </span>
+                <span class="post-date">{{ formatDate(post.createdAt) }}</span>
+                @if (!post.published) {
+                  <span class="post-status draft">Draft</span>
+                }
+              </div>
+            </div>
+
+            <div class="post-excerpt">
+              <p>{{ getExcerpt(post.content) }}</p>
+            </div>
+
+            @if (post.categories.length > 0 || post.tags.length > 0) {
+              <div class="post-taxonomy">
+                @if (post.categories.length > 0) {
+                  <div class="categories">
+                    @for (category of post.categories; track category.id) {
+                      <span class="category-tag">{{ category.name }}</span>
+                    }
+                  </div>
+                }
+                @if (post.tags.length > 0) {
+                  <div class="tags">
+                    @for (tag of post.tags; track tag.id) {
+                      <span class="tag">{{ tag.name }}</span>
+                    }
+                  </div>
+                }
+              </div>
+            }
+          </div>
+
+          <div class="post-actions">
+            <button [routerLink]="['/posts', post.id]" class="btn btn-outline btn-sm">
+              Read More
+            </button>
+            <button [routerLink]="['/posts', post.id, 'edit']" class="btn btn-secondary btn-sm">
+              Edit
+            </button>
+            <button (click)="deletePost(post.id)" class="btn btn-danger btn-sm">
+              Delete
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

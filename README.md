@@ -1,13 +1,268 @@
-# Turborepo starter
+# Node Admin - Full-Stack Blog Platform
 
-This Turborepo starter is maintained by the Turborepo core team.
+A comprehensive full-stack monorepo application built with Turborepo, featuring a Node.js GraphQL backend, Angular frontend, and PostgreSQL database.
 
-## Using this example
+## 🚀 Features
 
-Run the following command:
+- **Backend**: Node.js with Express, GraphQL (Apollo Server 4), Prisma ORM
+- **Frontend**: Angular 20 with Apollo GraphQL client
+- **Database**: PostgreSQL with Prisma schema
+- **Authentication**: JWT-based with role-based access control
+- **Admin Interface**: AdminJS for database management
+- **Monorepo**: Turborepo for efficient workspace management
+- **Docker**: Complete containerization support
 
-```sh
-npx create-turbo@latest
+## 📁 Project Structure
+
+```
+node-admin/
+├── apps/
+│   ├── backend/          # Node.js GraphQL API server
+│   │   ├── src/
+│   │   │   ├── resolvers/    # GraphQL resolvers
+│   │   │   ├── middleware/   # Authentication middleware
+│   │   │   └── server.ts     # Express server setup
+│   │   └── package.json
+│   └── frontend/         # Angular SPA
+│       ├── src/
+│       │   ├── app/
+│       │   │   ├── components/   # Angular components
+│       │   │   ├── services/     # GraphQL services
+│       │   │   └── app.ts        # Main app component
+│       │   └── main.ts
+│       └── package.json
+├── prisma/
+│   ├── schema.prisma     # Database schema
+│   └── seed.ts           # Database seeding
+├── docker-compose.yml    # Docker services
+├── turbo.json           # Turborepo configuration
+└── package.json         # Root workspace
+```
+
+## 🛠️ Technology Stack
+
+### Backend
+- **Node.js** - Runtime environment
+- **Express** - Web framework
+- **Apollo Server 4** - GraphQL server
+- **Prisma** - Database ORM and migrations
+- **AdminJS** - Admin interface
+- **JWT** - Authentication tokens
+- **bcrypt** - Password hashing
+
+### Frontend
+- **Angular 20** - Frontend framework
+- **Apollo Angular** - GraphQL client
+- **Reactive Forms** - Form handling
+- **SCSS** - Styling
+- **TypeScript** - Type safety
+
+### Database
+- **PostgreSQL** - Primary database
+- **Prisma Client** - Type-safe database access
+
+## 🚀 Quick Start
+
+### Prerequisites
+- Node.js 20+
+- PostgreSQL 15+ (or Docker)
+- npm or yarn
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd node-admin
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Setup environment variables**
+   
+   Create `.env` file in the root:
+   ```env
+   DATABASE_URL="postgresql://postgres:password@localhost:5432/node_admin"
+   JWT_SECRET="your-super-secret-jwt-key-here"
+   PORT=4000
+   ```
+
+4. **Setup database**
+   ```bash
+   # Start PostgreSQL (if using Docker)
+   docker run --name postgres -e POSTGRES_PASSWORD=password -e POSTGRES_DB=node_admin -p 5432:5432 -d postgres:15
+
+   # Generate Prisma client and run migrations
+   npx prisma generate
+   npx prisma db push
+
+   # Seed the database
+   npx prisma db seed
+   ```
+
+5. **Start the development servers**
+   ```bash
+   # Start both backend and frontend
+   npm run dev
+
+   # Or start individually
+   npm run dev:backend   # Starts on http://localhost:4000
+   npm run dev:frontend  # Starts on http://localhost:4200
+   ```
+
+### Using Docker
+
+1. **Start with Docker Compose**
+   ```bash
+   docker-compose up -d
+   ```
+
+2. **Access the applications**
+   - Frontend: http://localhost:4200
+   - Backend GraphQL: http://localhost:4000/graphql
+   - AdminJS: http://localhost:4000/admin
+
+## 📝 API Documentation
+
+### GraphQL Schema
+
+#### User Management
+```graphql
+type User {
+  id: ID!
+  email: String!
+  username: String
+  role: Role!
+  posts: [Post!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type AuthPayload {
+  user: User!
+  token: String!
+}
+
+# Mutations
+login(email: String!, password: String!): AuthPayload
+register(email: String!, password: String!, username: String): AuthPayload
+```
+
+#### Posts Management
+```graphql
+type Post {
+  id: ID!
+  title: String!
+  content: String!
+  published: Boolean!
+  author: User!
+  categories: [Category!]!
+  tags: [Tag!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+# Queries
+posts: [Post!]!
+post(id: ID!): Post
+
+# Mutations
+createPost(input: CreatePostInput!): Post!
+updatePost(id: ID!, input: UpdatePostInput!): Post!
+deletePost(id: ID!): Post!
+```
+
+### REST Endpoints
+
+- **AdminJS Interface**: `GET /admin` - Database administration
+- **GraphQL Playground**: `GET /graphql` - Interactive GraphQL explorer
+- **Health Check**: `GET /health` - Server health status
+
+## 🔐 Authentication
+
+The application uses JWT-based authentication with the following roles:
+
+- **USER** - Can create and manage their own posts
+- **MODERATOR** - Can moderate posts and users
+- **ADMIN** - Full access to all features
+
+### Default Users (after seeding)
+
+- **Admin**: admin@example.com / password123
+- **User**: user@example.com / password123
+
+## 🏗️ Development
+
+### Available Scripts
+
+```bash
+# Root workspace
+npm run dev          # Start all applications
+npm run build        # Build all applications
+npm run lint         # Lint all code
+npm run test         # Run all tests
+
+# Backend specific
+npm run dev:backend     # Start backend only
+npm run build:backend   # Build backend
+npm run test:backend    # Test backend
+
+# Frontend specific
+npm run dev:frontend    # Start frontend only
+npm run build:frontend  # Build frontend
+npm run test:frontend   # Test frontend
+
+# Database
+npm run db:generate     # Generate Prisma client
+npm run db:push         # Push schema to database
+npm run db:seed         # Seed database
+npm run db:studio       # Open Prisma Studio
+```
+
+## 🔧 Configuration
+
+### Environment Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `DATABASE_URL` | PostgreSQL connection string | Required |
+| `JWT_SECRET` | Secret for JWT token signing | Required |
+| `PORT` | Backend server port | 4000 |
+| `NODE_ENV` | Environment mode | development |
+
+## 🚀 Deployment
+
+### Production Build
+
+```bash
+# Build all applications
+npm run build
+
+# Start production server
+npm run start
+```
+
+### Docker Production
+
+```bash
+# Build and start with Docker Compose
+docker-compose -f docker-compose.prod.yml up -d
+```
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+---
+
+**Happy Coding! 🎉**
 ```
 
 ## What's inside?
